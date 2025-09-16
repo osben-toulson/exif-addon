@@ -43,6 +43,16 @@ export class App extends LitElement {
         return style;
     }
 
+    async firstUpdated() {
+        // Get the UI runtime.
+        const { runtime } = this.addOnUISdk.instance;
+
+        // Get the proxy object, which is required
+        // to call the APIs defined in the Document Sandbox runtime
+        // i.e., in the `code.ts` file of this add-on.
+        this._sandboxProxy = await runtime.apiProxy(RuntimeType.documentSandbox);
+    }
+
     async _onFileChange(e) {
         this.fileError = "";
         const file = e.target.files[0];
