@@ -43,21 +43,22 @@ export class App extends LitElement {
         return style;
     }
 
-    async firstUpdated() {
-        // Get the UI runtime.
-        const { runtime } = this.addOnUISdk.instance;
-
-        // Get the proxy object, which is required
-        // to call the APIs defined in the Document Sandbox runtime
-        // i.e., in the `code.ts` file of this add-on.
-    this._sandboxProxy = await runtime.apiProxy(RuntimeType.documentSandbox);
-    }
-
-
     async _onFileChange(e) {
         this.fileError = "";
         const file = e.target.files[0];
         if (!file) return;
+
+        // Add image to document immediately using Adobe Express Add-on SDK
+        try {
+            await this.addOnUISdk.app.document.addImage(file, {
+                title: file.name,
+                author: "Uploaded by user"
+            });
+        } catch (err) {
+            this.fileError = "Could not add image to document.";
+        }
+
+        // Extract EXIF as before
         try {
             const exif = await exifr.parse(file, [
                 "Make",
