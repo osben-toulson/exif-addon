@@ -1,3 +1,4 @@
+import "@spectrum-web-components/number-field/sp-number-field.js";
 // To support: system="express" scale="medium" color="light"
 // import these spectrum web components modules:
 import "@spectrum-web-components/theme/express/scale-medium.js";
@@ -38,6 +39,9 @@ export class App extends LitElement {
 
     @state()
     fileError = "";
+
+    @state()
+    textSize = 10;
 
     static get styles() {
         return style;
@@ -98,13 +102,18 @@ export class App extends LitElement {
         this.requestUpdate();
     }
 
+
     _onInputChange(e, field) {
         this.exifData = { ...this.exifData, [field]: e.target.value };
     }
 
+    _onTextSizeChange(e) {
+        this.textSize = Number(e.target.value);
+    }
+
     async _applyExifToDoc() {
         if (this._sandboxProxy && Object.values(this.exifData).some(v => v)) {
-            await this._sandboxProxy.applyExifData(this.exifData);
+            await this._sandboxProxy.applyExifData({ ...this.exifData, textSize: this.textSize });
         }
     }
 
@@ -136,6 +145,14 @@ export class App extends LitElement {
                     Focal Length:
                     <input type="text" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} />
                 </label>
+                <sp-number-field
+                    min="1"
+                    max="1000"
+                    step="1"
+                    .value=${this.textSize}
+                    label="Text Size"
+                    @input=${this._onTextSizeChange.bind(this)}
+                ></sp-number-field>
                 <sp-button size="m" @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
             </div>
         </sp-theme>`;
