@@ -68,20 +68,20 @@ export class App extends LitElement {
             this.fileError = "Could not add image to document.";
         }
 
-        // Extract EXIF as before
+        // Extract EXIF
         try {
             const exif = await exifr.parse(file, [
                 "Make",
                 "Model",
                 "ExposureTime",
-                "ISOSpeedRatings",
+                "ISO",
                 "LensModel",
                 "FocalLength"
             ]);
             this.exifData = {
                 camera: [exif.Make, exif.Model].filter(Boolean).join(" ") || "",
                 shutterSpeed: exif.ExposureTime ? `1/${Math.round(1/exif.ExposureTime)}` : "",
-                iso: exif.ISOSpeedRatings ? String(exif.ISOSpeedRatings) : "",
+                iso: exif.ISO ? String(exif.ISO) : "",
                 lens: exif.LensModel || "",
                 focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : ""
             };
