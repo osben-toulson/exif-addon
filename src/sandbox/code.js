@@ -1,10 +1,9 @@
 import addOnSandboxSdk from "add-on-sdk-document-sandbox";
 import { editor, fonts, colorUtils } from "express-document-sdk";
 
-// Get the document sandbox runtime.
 const { runtime } = addOnSandboxSdk.instance;
-
 const font = await fonts.fromPostscriptName("MyriadPro-Regular");
+const docWidth = editor.context.insertionParent.width || 800;
 
 function start() {
     // APIs to be exposed to the UI runtime
@@ -19,7 +18,7 @@ function start() {
          * @param {string} exifData.lens
          * @param {string} exifData.focalLength
          */
-    applyExifData: ({ camera, shutterSpeed, iso, lens, focalLength, textSize, textColor }) => {
+        applyExifData: ({ camera, shutterSpeed, iso, lens, focalLength, textSize, textColor }) => {
             const insertionParent = editor.context.insertionParent;
             const fields = [
                 { label: "Camera", value: camera },
@@ -29,35 +28,38 @@ function start() {
                 { label: "Focal Length", value: focalLength }
             ];
 
-            // Check to see if exifGroup already exists
-            let i = 0;
-            for (const child of editor.context.insertionParent.children) {
-                if (child.addOnData.getItem("name") === "EXIF Data") {
-                    for (const field of child.children) {
-                        console.log("field: " + field.text);
-                        const name = field.addOnData.getItem("name");
-                        switch (name) {
-                            case "Camera":
-                                if (camera) field.fullContent.replaceText(camera, { start: 0, length: field.text.length });
-                                break;
-                            case "Shutter Speed":
-                                if (shutterSpeed) field.fullContent.replaceText(shutterSpeed, { start: 0, length: field.text.length });
-                                break;
-                            case "ISO":
-                                if (iso) field.fullContent.replaceText(iso, { start: 0, length: field.text.length });
-                                break;
-                            case "Lens":
-                                if (lens) field.fullContent.replaceText(lens, { start: 0, length: field.text.length });
-                                break;
-                            case "Focal Length":
-                                if (focalLength) field.fullContent.replaceText(focalLength, { start: 0, length: field.text.length });
-                                break;
-                        }
-                    }
-                    return;
-                }
-            }
-            
+            // Uncomment when replacetext is supported
+            // This will allow the user to update the exif data in the current fields
+            // instead of creating a new group each time.
+            // // Check to see if exifGroup already exists
+            // let i = 0;
+            // for (const child of editor.context.insertionParent.children) {
+            //     if (child.addOnData.getItem("name") === "EXIF Data") {
+            //         for (const field of child.children) {
+            //             console.log("field: " + field.text);
+            //             const name = field.addOnData.getItem("name");
+            //             switch (name) {
+            //                 case "Camera":
+            //                     if (camera) field.fullContent.replaceText(camera, { start: 0, length: field.text.length });
+            //                     break;
+            //                 case "Shutter Speed":
+            //                     if (shutterSpeed) field.fullContent.replaceText(shutterSpeed, { start: 0, length: field.text.length });
+            //                     break;
+            //                 case "ISO":
+            //                     if (iso) field.fullContent.replaceText(iso, { start: 0, length: field.text.length });
+            //                     break;
+            //                 case "Lens":
+            //                     if (lens) field.fullContent.replaceText(lens, { start: 0, length: field.text.length });
+            //                     break;
+            //                 case "Focal Length":
+            //                     if (focalLength) field.fullContent.replaceText(focalLength, { start: 0, length: field.text.length });
+            //                     break;
+            //             }
+            //         }
+            //         return;
+            //     }
+            // }
+
             // Create a new group for EXIF data
             const exifGroup = editor.createGroup();
             exifGroup.addOnData.setItem("name", "EXIF Data");
@@ -79,7 +81,11 @@ function start() {
                     fontSize: textSize,
                     color: color,
                 });
-                textField.translation = { x: 100, y: 100 + idx * (textSize + 5) };
+                textField.translation = { x: 0, y: 0 + idx * (textSize + 15) };
+                exifGroup.translation = {
+                    x: docWidth / 2,
+                    y: docWidth / 2
+                };
                 exifGroup.children.append(textField);
             });
             editor.context.insertionParent.children.append(exifGroup);

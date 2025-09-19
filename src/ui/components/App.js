@@ -1,22 +1,16 @@
 import "@spectrum-web-components/number-field/sp-number-field.js";
-// To support: system="express" scale="medium" color="light"
-// import these spectrum web components modules:
 import "@spectrum-web-components/theme/express/scale-medium.js";
 import "@spectrum-web-components/theme/express/theme-light.js";
 import "@spectrum-web-components/theme/scale-medium.js";
 import "@spectrum-web-components/theme/theme-light.js";
-
-// To learn more about using "spectrum web components" visit:
-// https://opensource.adobe.com/spectrum-web-components/
+import "@spectrum-web-components/field-label/sp-field-label.js";
+import '@spectrum-web-components/textfield/sp-textfield.js';
 import "@spectrum-web-components/button/sp-button.js";
 import "@spectrum-web-components/theme/sp-theme.js";
-
-
 import exifr from "exifr";
 import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { style } from "./App.css";
-
 import { RuntimeType } from "https://new.express.adobe.com/static/add-on-sdk/sdk.js";
 
 @customElement("add-on-app")
@@ -121,7 +115,6 @@ export class App extends LitElement {
         this.requestUpdate();
     }
 
-
     _onInputChange(e, field) {
         this.exifData = { ...this.exifData, [field]: e.target.value };
     }
@@ -140,33 +133,21 @@ export class App extends LitElement {
         return html`
         <sp-theme system="express" color="light" scale="medium">
             <div class="container">
-                <label>
-                    Upload Image or Video:
-                    <input type="file" accept="image/*,video/*" @change=${this._onFileChange.bind(this)} />
-                </label>
+                <sp-field-label size="xl" for="fileInput">Upload Image or Video:</sp-field-label>
+                <input id="fileInput" type="file" accept="image/*,video/*" style="display:none" @change=${this._onFileChange.bind(this)} />
+                <sp-button size="s" @click=${() => this.renderRoot.getElementById('fileInput').click()}>Choose File</sp-button>
                 ${this.fileError ? html`<div style="color:red;">${this.fileError}</div>` : ""}
-                <label>
-                    Camera:
-                </label>
-                <input type="text" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} />
-                <label>
-                Shutter Speed:
-                </label>
-                    <input type="text" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} />
-                <label>
-                ISO:
-                </label>
-                    <input type="text" .value=${this.exifData.iso} @input=${e => this._onInputChange(e, "iso")} />
-                <label>
-                Lens:
-                </label>
-                    <input type="text" .value=${this.exifData.lens} @input=${e => this._onInputChange(e, "lens")} />
-                <label>
-                Focal Length:
-                </label>
-                    <input type="text" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} />
-                
-                <label>Customize Text</label>
+                <sp-field-label size="xl" for="cameraInput">Camera:</sp-field-label>
+                <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
+                <sp-field-label size="xl" for="shutterSpeedInput">Shutter Speed:</sp-field-label>
+                <sp-textfield id="shutterSpeedInput" size="l" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} ></sp-textfield>
+                <sp-field-label size="xl" for="isoInput">ISO:</sp-field-label>
+                <sp-textfield id="isoInput" size="l" .value=${this.exifData.iso} @input=${e => this._onInputChange(e, "iso")} ></sp-textfield>
+                <sp-field-label size="xl" for="lensInput">Lens:</sp-field-label>
+                <sp-textfield id="lensInput" size="l" .value=${this.exifData.lens} @input=${e => this._onInputChange(e, "lens")} ></sp-textfield>
+                <sp-field-label size="xl" for="focalLengthInput">Focal Length:</sp-field-label>
+                <sp-textfield id="focalLengthInput" size="l" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} ></sp-textfield>
+                <sp-field-label size="xl">Customize Text</sp-field-label>
                 <table>
                     <tr>
                         <td>Text Size</td>
@@ -186,7 +167,7 @@ export class App extends LitElement {
                 <div id="colorPickerBtn" style="width:30px;height:30px;border:1px solid #ccc;border-radius:4px;display:inline-block;vertical-align:middle;background:${this.textColor}" tabindex="0" role="button" aria-label="Pick Text Color" title="Pick Text Color"></div>
                 </tr>
                 </table>
-                <sp-button size="m" @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
+                <sp-button size="l" @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
             </div>
         </sp-theme>`;
     }
