@@ -40,7 +40,7 @@ export class App extends LitElement {
     fileError = "";
 
     @state()
-    textSize = 10;
+    textSize = 20;
 
     @state()
     textColor = "#000000FF";

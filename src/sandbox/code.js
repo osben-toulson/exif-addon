@@ -62,7 +62,7 @@ function start() {
             const exifGroup = editor.createGroup();
             exifGroup.addOnData.setItem("name", "EXIF Data");
             fields.forEach(({ label, value }, idx) => {
-                const textField = editor.createText(`${label}: ${value}`);
+                const textField = editor.createText(`${value}`);
                 textField.addOnData.setItem("name", label);
                 const contentModel = textField.fullContent;
                 let color = { red: 1, green: 1, blue: 1, alpha: 1 };
