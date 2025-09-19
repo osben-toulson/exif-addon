@@ -1,5 +1,5 @@
 # End User License Agreement (EULA)  
-**for [Your Add-On Name]**
+**for exif (Adobe Express add-on)**
 
 By installing or using this add-on (“Software”), you agree to the following terms:
 
@@ -12,7 +12,7 @@ You may not:
 - Remove or alter any proprietary notices on the Software.  
 
 ## 3. Ownership  
-All rights remain with [Your Company]. Adobe is not responsible for this Software.
+All rights remain with Osben Toulson Photography Consulting. Adobe is not responsible for this Software.
 
 ## 4. Data  
 The Software may access EXIF metadata from images you upload. See our Privacy Policy for details.
@@ -21,7 +21,7 @@ The Software may access EXIF metadata from images you upload. See our Privacy Po
 The Software is provided “as is” without warranties of any kind.
 
 ## 6. Liability  
-[Your Company] is not liable for damages arising from use of the Software.
+Osben Toulson Photography Consulting is not liable for damages arising from use of the Software.
 
 ## 7. Termination  
 We may revoke this license if you violate these terms.

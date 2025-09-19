@@ -1,11 +1,11 @@
 # Privacy Policy  
-**for [Your Add-On Name]**  
+**for exif (Adobe Express add-on)**
 
-_Last updated: [Date]_  
+Last updated: 9/19/2025
 
-[Your Company] (“we,” “our,” or “us”) respects your privacy. This Privacy Policy explains how our add-on (“Software”) handles data.  
+Osben Toulson Photography Consulting (“we,” “our,” or “us”) respects your privacy. This Privacy Policy explains how our add-on (“Software”) handles data.  
 
-## 1. Information We Collect  
+## 1. Information We Collect
 - The Software may access **EXIF metadata** from images you upload, such as camera model, lens, aperture, shutter speed, and similar technical details.  
 - Some images may include **GPS location data** in the EXIF. If present, this may be accessed.  
 
@@ -23,4 +23,4 @@ Because no data is transmitted or stored, the risk of unauthorized access is min
 We may update this Privacy Policy from time to time. The latest version will always be available with the Software.  
 
 ## 6. Contact  
-If you have questions, contact us at: [Your Email Address]  
+If you have questions, contact us at: osben.toulson@gmail.com
