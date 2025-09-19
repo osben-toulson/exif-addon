@@ -1,9 +1,10 @@
 import addOnSandboxSdk from "add-on-sdk-document-sandbox";
-import { editor } from "express-document-sdk";
+import { editor, fonts, colorUtils } from "express-document-sdk";
 
 // Get the document sandbox runtime.
 const { runtime } = addOnSandboxSdk.instance;
 
+const font = await fonts.fromPostscriptName("MyriadPro-Regular");
 
 function start() {
     // APIs to be exposed to the UI runtime
@@ -18,7 +19,7 @@ function start() {
          * @param {string} exifData.lens
          * @param {string} exifData.focalLength
          */
-        applyExifData: ({ camera, shutterSpeed, iso, lens, focalLength, textSize }) => {
+    applyExifData: ({ camera, shutterSpeed, iso, lens, focalLength, textSize, textColor }) => {
             const insertionParent = editor.context.insertionParent;
             const fields = [
                 { label: "Camera", value: camera },
@@ -56,7 +57,7 @@ function start() {
                     return;
                 }
             }
-
+            
             // Create a new group for EXIF data
             const exifGroup = editor.createGroup();
             exifGroup.addOnData.setItem("name", "EXIF Data");
@@ -64,10 +65,19 @@ function start() {
                 const textField = editor.createText(`${label}: ${value}`);
                 textField.addOnData.setItem("name", label);
                 const contentModel = textField.fullContent;
+                let color = { red: 1, green: 1, blue: 1, alpha: 1 };
+                if (textColor) {
+                    try {
+                        color = colorUtils.fromHex(textColor);
+                    } catch (e) {
+                        // fallback to default white
+                    }
+                }
+
                 contentModel.applyCharacterStyles({
-                    fontFamily: "Myriad Pro",
+                    font: font,
                     fontSize: textSize,
-                    fill: { red: 1, green: 0, blue: 0, alpha: 1 }
+                    color: color,
                 });
                 textField.translation = { x: 100, y: 100 + idx * (textSize + 5) };
                 exifGroup.children.append(textField);

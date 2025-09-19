@@ -24,7 +24,6 @@ export class App extends LitElement {
     @property({ type: Object })
     addOnUISdk;
 
-
     @state()
     _sandboxProxy;
 
@@ -43,6 +42,9 @@ export class App extends LitElement {
     @state()
     textSize = 10;
 
+    @state()
+    textColor = "#000000FF";
+
     static get styles() {
         return style;
     }
@@ -55,6 +57,23 @@ export class App extends LitElement {
         // to call the APIs defined in the Document Sandbox runtime
         // i.e., in the `code.ts` file of this add-on.
         this._sandboxProxy = await runtime.apiProxy(RuntimeType.documentSandbox);
+
+        // Set up color picker event listeners
+        // In firstUpdated():
+        const colorPickerBtn = this.renderRoot.getElementById("colorPickerBtn");
+        if (colorPickerBtn) {
+            colorPickerBtn.addEventListener("click", () => {
+                this.addOnUISdk.app.showColorPicker(colorPickerBtn, {
+                    title: "Pick Text Color",
+                    initialColor: this.textColor,
+                    disableAlphaChannel: false
+                });
+            });
+            colorPickerBtn.addEventListener("colorpicker-color-change", (event) => {
+                this.textColor = event.detail.color;
+                this.requestUpdate();
+            });
+        }
     }
 
     async _onFileChange(e) {
@@ -84,7 +103,7 @@ export class App extends LitElement {
             ]);
             this.exifData = {
                 camera: [exif.Make, exif.Model].filter(Boolean).join(" ") || "",
-                shutterSpeed: exif.ExposureTime ? `1/${Math.round(1/exif.ExposureTime)}` : "",
+                shutterSpeed: exif.ExposureTime ? `1/${Math.round(1 / exif.ExposureTime)}` : "",
                 iso: exif.ISO ? String(exif.ISO) : "",
                 lens: exif.LensModel || "",
                 focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : ""
@@ -113,12 +132,13 @@ export class App extends LitElement {
 
     async _applyExifToDoc() {
         if (this._sandboxProxy && Object.values(this.exifData).some(v => v)) {
-            await this._sandboxProxy.applyExifData({ ...this.exifData, textSize: this.textSize });
+            await this._sandboxProxy.applyExifData({ ...this.exifData, textSize: this.textSize, textColor: this.textColor });
         }
     }
 
     render() {
-        return html` <sp-theme system="express" color="light" scale="medium">
+        return html`
+        <sp-theme system="express" color="light" scale="medium">
             <div class="container">
                 <label>
                     Upload Image or Video:
@@ -127,32 +147,45 @@ export class App extends LitElement {
                 ${this.fileError ? html`<div style="color:red;">${this.fileError}</div>` : ""}
                 <label>
                     Camera:
-                    <input type="text" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} />
                 </label>
+                <input type="text" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} />
                 <label>
-                    Shutter Speed:
+                Shutter Speed:
+                </label>
                     <input type="text" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} />
-                </label>
                 <label>
-                    ISO:
+                ISO:
+                </label>
                     <input type="text" .value=${this.exifData.iso} @input=${e => this._onInputChange(e, "iso")} />
-                </label>
                 <label>
-                    Lens:
+                Lens:
+                </label>
                     <input type="text" .value=${this.exifData.lens} @input=${e => this._onInputChange(e, "lens")} />
-                </label>
                 <label>
-                    Focal Length:
-                    <input type="text" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} />
+                Focal Length:
                 </label>
-                <sp-number-field
-                    min="1"
-                    max="1000"
-                    step="1"
+                    <input type="text" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} />
+                
+                <label>Customize Text</label>
+                <table>
+                    <tr>
+                        <td>Text Size</td>
+                        <td>Color</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <sp-number-field
+                                min="1"
+                                max="1000"
+                                step="1"
                     .value=${this.textSize}
                     label="Text Size"
                     @input=${this._onTextSizeChange.bind(this)}
                 ></sp-number-field>
+                <td>
+                <div id="colorPickerBtn" style="width:30px;height:30px;border:1px solid #ccc;border-radius:4px;display:inline-block;vertical-align:middle;background:${this.textColor}" tabindex="0" role="button" aria-label="Pick Text Color" title="Pick Text Color"></div>
+                </tr>
+                </table>
                 <sp-button size="m" @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
             </div>
         </sp-theme>`;
