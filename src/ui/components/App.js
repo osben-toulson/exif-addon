@@ -34,6 +34,15 @@ export class App extends LitElement {
     fileError = "";
 
     @state()
+    shutterSpeedError = "";
+
+    @state()
+    isoError = "";
+
+    @state()
+    focalLengthError = "";
+
+    @state()
     textSize = 20;
 
     @state()
@@ -75,48 +84,113 @@ export class App extends LitElement {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Add image to document immediately using Adobe Express Add-on SDK
-        try {
-            await this.addOnUISdk.app.document.addImage(file, {
-                title: file.name,
-                author: "Uploaded by user"
-            });
-        } catch (err) {
-            this.fileError = "Could not add image to document.";
+        const fileName = file.name.toLowerCase();
+        let fileType = "other";
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png") || fileName.endsWith(".gif") || fileName.endsWith(".bmp")) {
+            fileType = "image";
+        } else if (fileName.endsWith(".mp4") || fileName.endsWith(".mov") || fileName.endsWith(".avi") || fileName.endsWith(".webm")) {
+            fileType = "video";
         }
 
-        // Extract EXIF
-        try {
-            const exif = await exifr.parse(file, [
-                "Make",
-                "Model",
-                "ExposureTime",
-                "ISO",
-                "LensModel",
-                "FocalLength"
-            ]);
-            this.exifData = {
-                camera: [exif.Make, exif.Model].filter(Boolean).join(" ") || "",
-                shutterSpeed: exif.ExposureTime ? `1/${Math.round(1 / exif.ExposureTime)}` : "",
-                iso: exif.ISO ? String(exif.ISO) : "",
-                lens: exif.LensModel || "",
-                focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : ""
-            };
-        } catch (err) {
-            this.fileError = "Could not read EXIF data.";
-            this.exifData = {
-                camera: "",
-                shutterSpeed: "",
-                iso: "",
-                lens: "",
-                focalLength: ""
-            };
+        switch (fileType) {
+            case "image":
+                // Add image to document
+                try {
+                    await this.addOnUISdk.app.document.addImage(file, {
+                        title: file.name,
+                        author: "Uploaded by user"
+                    });
+                } catch (err) {
+                    this.fileError = "Could not add image to document.";
+                }
+                // Extract EXIF
+                try {
+                    const exif = await exifr.parse(file, [
+                        "Make",
+                        "Model",
+                        "ExposureTime",
+                        "ISO",
+                        "LensModel",
+                        "FocalLength"
+                    ]);
+                    this.exifData = {
+                        camera: exif.Model || "",
+                        shutterSpeed: exif.ExposureTime ? `1/${Math.round(1 / exif.ExposureTime)}` : "",
+                        iso: exif.ISO ? String(exif.ISO) : "",
+                        lens: exif.LensModel || "",
+                        focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : ""
+                    };
+                } catch (err) {
+                    this.exifData = {
+                        camera: "",
+                        shutterSpeed: "",
+                        iso: "",
+                        lens: "",
+                        focalLength: ""
+                    };
+                }
+                break;
+            case "video":
+                // Add video to document
+                try {
+                    await this.addOnUISdk.app.document.addVideo(file, {
+                        title: file.name,
+                        author: "Uploaded by user"
+                    });
+                } catch (err) {
+                    this.fileError = "Could not add video to document.";
+                }
+                // No EXIF extraction for video
+                this.exifData = {
+                    camera: "",
+                    shutterSpeed: "",
+                    iso: "",
+                    lens: "",
+                    focalLength: ""
+                };
+                break;
+            default:
+                this.fileError = "Unsupported file type.";
+                this.exifData = {
+                    camera: "",
+                    shutterSpeed: "",
+                    iso: "",
+                    lens: "",
+                    focalLength: ""
+                };
         }
         this.requestUpdate();
+
     }
 
-    _onInputChange(e, field) {
+    async _onInputChange(e, field) {       
         this.exifData = { ...this.exifData, [field]: e.target.value };
+        if (field === "shutterSpeed") {
+            const result = await this._sandboxProxy.validateExifField(field, e.target.value);
+            if (result !== true) {
+                this.shutterSpeedError = result;
+            } else {
+                this.shutterSpeedError = "";
+            }
+        }
+
+        if (field === "iso") {
+            const result = await this._sandboxProxy.validateExifField(field, e.target.value);
+            if (result !== true) {
+                this.isoError = result;
+            } else {
+                this.isoError = "";
+            }
+        }
+
+        if (field === "focalLength") {
+            const result = await this._sandboxProxy.validateExifField(field, e.target.value);
+            if (result !== true) {
+                this.focalLengthError = result;
+            } else {
+                this.focalLengthError = "";
+            }
+        }
     }
 
     _onTextSizeChange(e) {
@@ -129,24 +203,41 @@ export class App extends LitElement {
         }
     }
 
+    _clearExifData() {
+        this.exifData = {
+            camera: "",
+            shutterSpeed: "",
+            iso: "",
+            lens: "",
+            focalLength: ""
+        };
+
+        this.shutterSpeedError = "";
+        this.isoError = "";
+        this.focalLengthError = "";
+    }
+
     render() {
         return html`
         <sp-theme system="express" color="light" scale="medium">
             <div class="container">
-                <sp-field-label size="xl" for="fileInput">Upload Image or Video:</sp-field-label>
-                <input id="fileInput" type="file" accept="image/*,video/*" style="display:none" @change=${this._onFileChange.bind(this)} />
+                <sp-field-label size="xl" for="fileInput">Upload Image:</sp-field-label>
+                <input id="fileInput" type="file" accept="image/*" style="display:none" @change=${this._onFileChange.bind(this)} />
                 <sp-button size="s" @click=${() => this.renderRoot.getElementById('fileInput').click()}>Choose File</sp-button>
                 ${this.fileError ? html`<div style="color:red;">${this.fileError}</div>` : ""}
                 <sp-field-label size="xl" for="cameraInput">Camera:</sp-field-label>
                 <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
                 <sp-field-label size="xl" for="shutterSpeedInput">Shutter Speed:</sp-field-label>
                 <sp-textfield id="shutterSpeedInput" size="l" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} ></sp-textfield>
+                ${this.shutterSpeedError ? html`<div style="color:red;">${this.shutterSpeedError}</div>` : ""}
                 <sp-field-label size="xl" for="isoInput">ISO:</sp-field-label>
                 <sp-textfield id="isoInput" size="l" .value=${this.exifData.iso} @input=${e => this._onInputChange(e, "iso")} ></sp-textfield>
+                ${this.isoError ? html`<div style="color:red;">${this.isoError}</div>` : ""}
                 <sp-field-label size="xl" for="lensInput">Lens:</sp-field-label>
                 <sp-textfield id="lensInput" size="l" .value=${this.exifData.lens} @input=${e => this._onInputChange(e, "lens")} ></sp-textfield>
                 <sp-field-label size="xl" for="focalLengthInput">Focal Length:</sp-field-label>
                 <sp-textfield id="focalLengthInput" size="l" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} ></sp-textfield>
+                ${this.focalLengthError ? html`<div style="color:red;">${this.focalLengthError}</div>` : ""}
                 <sp-field-label size="xl">Customize Text</sp-field-label>
                 <table>
                     <tr>
@@ -167,7 +258,9 @@ export class App extends LitElement {
                 <div id="colorPickerBtn" style="width:30px;height:30px;border:1px solid #ccc;border-radius:4px;display:inline-block;vertical-align:middle;background:${this.textColor}" tabindex="0" role="button" aria-label="Pick Text Color" title="Pick Text Color"></div>
                 </tr>
                 </table>
-                <sp-button size="l" @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
+                <div style="margin-top:20px"></div>
+                <sp-button size="l" @click=${this._clearExifData.bind(this)}>Reset</sp-button>
+                <sp-button style="margin-top:10px" size="l" ?disabled=${!Object.values(this.exifData).some(v => v && v.trim())} @click=${this._applyExifToDoc.bind(this)}>Apply to Document</sp-button>
             </div>
         </sp-theme>`;
     }

@@ -1,7 +1,7 @@
 {
     "testId": "9fa9c431-bb3b-4a32-9a26-9a71efcb4ab1",
     "name": "Exif",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "manifestVersion": 2,
     "requirements": {
         "apps": [

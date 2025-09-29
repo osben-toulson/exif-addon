@@ -64,6 +64,8 @@ function start() {
             const exifGroup = editor.createGroup();
             exifGroup.addOnData.setItem("name", "EXIF Data");
             fields.forEach(({ label, value }, idx) => {
+                if (!value || !value.trim()) return; // Skip empty values
+
                 const textField = editor.createText(`${value}`);
                 textField.addOnData.setItem("name", label);
                 const contentModel = textField.fullContent;
@@ -89,8 +91,34 @@ function start() {
                 exifGroup.children.append(textField);
             });
             editor.context.insertionParent.children.append(exifGroup);
+        },
+
+        validateExifField: (field, value) => {
+            if (field === "shutterSpeed") {
+                // Accept numbers or fractions like '1/125'
+                const isNumber = !isNaN(Number(value));
+                const isFraction = /^\d+\s*\/\s*\d+$/.test(value);
+                if (!isNumber && !isFraction) {
+                    return "Shutter Speed should be a number or a fraction (e.g., 1/125).";
+                }
+            }
+
+            if (field === "iso" && isNaN(Number(value))) {
+                return "ISO should be a number.";
+            }
+
+            if (field === "focalLength" && value.trim() !== "") {
+                // Require format: number followed by 'mm', e.g., '50mm'
+                const focalLengthPattern = /^\d+(\.\d+)?\s*mm$/i;
+                if (!focalLengthPattern.test(value.trim())) {
+                    return "Focal Length should be a number followed by 'mm' (e.g., 50mm).";
+                }
+            }
+
+            return true;
         }
     };
+
     runtime.exposeApi(sandboxApi);
 }
 
