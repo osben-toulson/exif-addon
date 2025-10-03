@@ -18,14 +18,15 @@ function start() {
          * @param {string} exifData.lens
          * @param {string} exifData.focalLength
          */
-        applyExifData: ({ camera, shutterSpeed, iso, lens, focalLength, textSize, textColor }) => {
+        applyExifData: ({ camera, fNumber, shutterSpeed, iso, lens, focalLength, textSize, textColor }) => {
             const insertionParent = editor.context.insertionParent;
             const fields = [
                 { label: "Camera", value: camera },
+                { label: "Aperture", value: fNumber },
                 { label: "Shutter Speed", value: shutterSpeed },
                 { label: "ISO", value: iso },
                 { label: "Lens", value: lens },
-                { label: "Focal Length", value: focalLength }
+                { label: "Focal Length", value: focalLength },
             ];
 
             // Uncomment when replacetext is supported
@@ -115,7 +116,14 @@ function start() {
                 }
             }
 
-            return true;
+            if (field === "fNumber" && value.trim() !== "") {
+                // Require format: f/number, e.g., 'f/2.8'
+                const aperturePattern = /^f\/\d+(\.\d+)?$/i;
+                if (!aperturePattern.test(value.trim())) {
+                    return "Aperture should be in the format 'f/number' (e.g., f/2.8).";
+                }
+                return true;
+            }
         }
     };
 
