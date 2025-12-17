@@ -122,7 +122,6 @@ function start() {
                 if (!aperturePattern.test(value.trim())) {
                     return "Aperture should be in the format 'f/number' (e.g., f/2.8).";
                 }
-                return true;
             }
         }
     };

@@ -197,6 +197,15 @@ export class App extends LitElement {
                 this.focalLengthError = "";
             }
         }
+
+        if (field === "fNumber") {
+            const result = await this._sandboxProxy.validateExifField(field, e.target.value);
+            if (result !== true) {
+                this.fNumberError = result;
+            } else {
+                this.fNumberError = "";
+            }
+        }
     }
 
     _onTextSizeChange(e) {
@@ -222,6 +231,7 @@ export class App extends LitElement {
         this.shutterSpeedError = "";
         this.isoError = "";
         this.focalLengthError = "";
+        this.fNumberError = "";
     }
 
     render() {
@@ -236,6 +246,7 @@ export class App extends LitElement {
                 <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
                 <sp-field-label size="xl" for="fNumberInput">Aperture:</sp-field-label>
                 <sp-textfield id="fNumberInput" size="l" .value=${this.exifData.fNumber} @input=${e => this._onInputChange(e, "fNumber")} ></sp-textfield>
+                ${this.fNumberError ? html`<div style="color:red;">${this.fNumberError}</div>` : ""}
                 <sp-field-label size="xl" for="shutterSpeedInput">Shutter Speed:</sp-field-label>
                 <sp-textfield id="shutterSpeedInput" size="l" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} ></sp-textfield>
                 ${this.shutterSpeedError ? html`<div style="color:red;">${this.shutterSpeedError}</div>` : ""}
