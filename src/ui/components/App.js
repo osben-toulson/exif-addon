@@ -44,6 +44,9 @@ export class App extends LitElement {
     focalLengthError = "";
 
     @state()
+    fNumberError = "";
+
+    @state()
     textSize = 20;
 
     @state()
@@ -173,7 +176,7 @@ export class App extends LitElement {
         this.exifData = { ...this.exifData, [field]: e.target.value };
         if (field === "shutterSpeed") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.shutterSpeedError = result;
             } else {
                 this.shutterSpeedError = "";
@@ -182,7 +185,7 @@ export class App extends LitElement {
 
         if (field === "iso") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.isoError = result;
             } else {
                 this.isoError = "";
@@ -191,10 +194,19 @@ export class App extends LitElement {
 
         if (field === "focalLength") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.focalLengthError = result;
             } else {
                 this.focalLengthError = "";
+            }
+        }
+
+        if (field === "fNumber") {
+            const result = await this._sandboxProxy.validateExifField(field, e.target.value);
+            if (result) {
+                this.fNumberError = result;
+            } else {
+                this.fNumberError = "";
             }
         }
     }
@@ -222,6 +234,7 @@ export class App extends LitElement {
         this.shutterSpeedError = "";
         this.isoError = "";
         this.focalLengthError = "";
+        this.fNumberError = "";
     }
 
     render() {
@@ -236,6 +249,7 @@ export class App extends LitElement {
                 <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
                 <sp-field-label size="xl" for="fNumberInput">Aperture:</sp-field-label>
                 <sp-textfield id="fNumberInput" size="l" .value=${this.exifData.fNumber} @input=${e => this._onInputChange(e, "fNumber")} ></sp-textfield>
+                ${this.fNumberError ? html`<div style="color:red;">${this.fNumberError}</div>` : ""}
                 <sp-field-label size="xl" for="shutterSpeedInput">Shutter Speed:</sp-field-label>
                 <sp-textfield id="shutterSpeedInput" size="l" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} ></sp-textfield>
                 ${this.shutterSpeedError ? html`<div style="color:red;">${this.shutterSpeedError}</div>` : ""}
