@@ -245,8 +245,7 @@ export class App extends LitElement {
                 <input id="fileInput" type="file" accept="image/*" style="display:none" @change=${this._onFileChange.bind(this)} />
                 <sp-button size="l" @click=${() => this.renderRoot.getElementById('fileInput').click()}>Choose File</sp-button>
                 ${this.fileError ? html`<div style="color:red;">${this.fileError}</div>` : ""}
-                <div style="margin-top: 20px;"></div>
-                <sp-field-label size="xl" for="cameraInput">Camera:</sp-field-label>
+                <sp-field-label size="xl" for="cameraInput" class="section-label">Camera:</sp-field-label>
                 <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
                 <sp-field-label size="xl" for="fNumberInput">Aperture:</sp-field-label>
                 <sp-textfield id="fNumberInput" size="l" .value=${this.exifData.fNumber} @input=${e => this._onInputChange(e, "fNumber")} ></sp-textfield>
@@ -262,7 +261,7 @@ export class App extends LitElement {
                 <sp-field-label size="xl" for="focalLengthInput">Focal Length:</sp-field-label>
                 <sp-textfield id="focalLengthInput" size="l" .value=${this.exifData.focalLength} @input=${e => this._onInputChange(e, "focalLength")} ></sp-textfield>
                 ${this.focalLengthError ? html`<div style="color:red;">${this.focalLengthError}</div>` : ""}
-                <sp-field-label size="xl" style="margin-top: 20px; margin-bottom: -10px;"><strong>Customize Text</strong></sp-field-label>
+                <sp-field-label size="xl" class="section-label"><strong>Customize Text</strong></sp-field-label>
                 <table>
                     <tr>
                         <td>Text Size</td>

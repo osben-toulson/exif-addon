@@ -8,11 +8,17 @@ export const style = css`
     }
 
     sp-field-label {
-        margin-bottom: 0px;
+        margin-bottom: 4px;
+        margin-top: 0px;
     }
 
     sp-textfield {
         margin-bottom: 20px;
-        margin-top: -15px;
+        margin-top: 0px;
+    }
+
+    .section-label {
+        margin-top: 20px;
+        margin-bottom: 8px;
     }
 `;
