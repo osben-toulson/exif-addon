@@ -44,6 +44,9 @@ export class App extends LitElement {
     focalLengthError = "";
 
     @state()
+    fNumberError = "";
+
+    @state()
     textSize = 20;
 
     @state()
