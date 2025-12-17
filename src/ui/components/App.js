@@ -24,10 +24,11 @@ export class App extends LitElement {
     @state()
     exifData = {
         camera: "",
+        fNumber: "",
         shutterSpeed: "",
         iso: "",
         lens: "",
-        focalLength: ""
+        focalLength: "",
     };
 
     @state()
@@ -111,14 +112,17 @@ export class App extends LitElement {
                         "ExposureTime",
                         "ISO",
                         "LensModel",
-                        "FocalLength"
+                        "FocalLength",
+                        "FNumber"
                     ]);
+
                     this.exifData = {
                         camera: exif.Model || "",
                         shutterSpeed: exif.ExposureTime ? `1/${Math.round(1 / exif.ExposureTime)}` : "",
                         iso: exif.ISO ? String(exif.ISO) : "",
                         lens: exif.LensModel || "",
-                        focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : ""
+                        focalLength: exif.FocalLength ? `${exif.FocalLength}mm` : "",
+                        fNumber: exif.FNumber ? `f/${exif.FNumber}` : ""
                     };
                 } catch (err) {
                     this.exifData = {
@@ -126,7 +130,8 @@ export class App extends LitElement {
                         shutterSpeed: "",
                         iso: "",
                         lens: "",
-                        focalLength: ""
+                        focalLength: "",
+                        fNumber: ""
                     };
                 }
                 break;
@@ -156,7 +161,8 @@ export class App extends LitElement {
                     shutterSpeed: "",
                     iso: "",
                     lens: "",
-                    focalLength: ""
+                    focalLength: "",
+                    fNumber: ""
                 };
         }
         this.requestUpdate();
@@ -206,10 +212,11 @@ export class App extends LitElement {
     _clearExifData() {
         this.exifData = {
             camera: "",
+            fNumber: "",
             shutterSpeed: "",
             iso: "",
             lens: "",
-            focalLength: ""
+            focalLength: "",
         };
 
         this.shutterSpeedError = "";
@@ -227,6 +234,8 @@ export class App extends LitElement {
                 ${this.fileError ? html`<div style="color:red;">${this.fileError}</div>` : ""}
                 <sp-field-label size="xl" for="cameraInput">Camera:</sp-field-label>
                 <sp-textfield id="cameraInput" size="l" .value=${this.exifData.camera} @input=${e => this._onInputChange(e, "camera")} ></sp-textfield>
+                <sp-field-label size="xl" for="fNumberInput">Aperture:</sp-field-label>
+                <sp-textfield id="fNumberInput" size="l" .value=${this.exifData.fNumber} @input=${e => this._onInputChange(e, "fNumber")} ></sp-textfield>
                 <sp-field-label size="xl" for="shutterSpeedInput">Shutter Speed:</sp-field-label>
                 <sp-textfield id="shutterSpeedInput" size="l" .value=${this.exifData.shutterSpeed} @input=${e => this._onInputChange(e, "shutterSpeed")} ></sp-textfield>
                 ${this.shutterSpeedError ? html`<div style="color:red;">${this.shutterSpeedError}</div>` : ""}
