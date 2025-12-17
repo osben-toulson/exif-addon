@@ -173,7 +173,7 @@ export class App extends LitElement {
         this.exifData = { ...this.exifData, [field]: e.target.value };
         if (field === "shutterSpeed") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.shutterSpeedError = result;
             } else {
                 this.shutterSpeedError = "";
@@ -182,7 +182,7 @@ export class App extends LitElement {
 
         if (field === "iso") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.isoError = result;
             } else {
                 this.isoError = "";
@@ -191,7 +191,7 @@ export class App extends LitElement {
 
         if (field === "focalLength") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.focalLengthError = result;
             } else {
                 this.focalLengthError = "";
@@ -200,7 +200,7 @@ export class App extends LitElement {
 
         if (field === "fNumber") {
             const result = await this._sandboxProxy.validateExifField(field, e.target.value);
-            if (result !== true) {
+            if (result) {
                 this.fNumberError = result;
             } else {
                 this.fNumberError = "";
