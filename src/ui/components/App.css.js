@@ -8,7 +8,7 @@ export const style = css`
     }
 
     sp-field-label {
-        margin-bottom: 4px;
+        margin-bottom: 0px;
         margin-top: 0px;
     }
 
